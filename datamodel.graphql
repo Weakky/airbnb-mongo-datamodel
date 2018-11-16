@@ -10,15 +10,15 @@ type User {
   responseRate: Float
   responseTime: Int
   isSuperHost: Boolean! @default(value: false)
-  ownedPlaces: [Place!]! @relation(strategy: EMBED)
-  location: Location @relation(strategy: EMBED)
-  bookings: [Booking!]! @relation(strategy: EMBED)
-  paymentAccount: [PaymentAccount!]! @relation(strategy: EMBED)
-  sentMessages: [Message!]! @relation(name: "SentMessages", strategy: EMBED)
-  receivedMessages: [Message!]! @relation(name: "ReceivedMessages", strategy: EMBED)
-  notifications: [Notification!]! @relation(strategy: EMBED)
-  profilePicture: Picture @relation(strategy: EMBED)
-  hostingExperiences: [Experience!]! @relation(strategy: EMBED)
+  ownedPlaces: [Place!]! @relation(link: INLINE)
+  location: Location @relation(link: INLINE)
+  bookings: [Booking!]! @relation(link: INLINE)
+  paymentAccount: [PaymentAccount!]! @relation(link: INLINE)
+  sentMessages: [Message!]! @relation(name: "SentMessages", link: INLINE)
+  receivedMessages: [Message!]! @relation(name: "ReceivedMessages", link: INLINE)
+  notifications: [Notification!]! @relation(link: INLINE)
+  profilePicture: Picture @relation(link: INLINE)
+  hostingExperiences: [Experience!]! @relation(link: INLINE)
 }
 
 type Place {
@@ -32,17 +32,17 @@ type Place {
   numBedrooms: Int!
   numBeds: Int!
   numBaths: Int!
-  reviews: [Review!]! @relation(strategy: EMBED)
-  amenities: Amenities! @relation(strategy: EMBED)
-  host: User! @relation(strategy: EMBED)
-  pricing: Pricing! @relation(strategy: EMBED)
-  location: Location! @relation(strategy: EMBED)
-  views: Views! @relation(strategy: EMBED)
-  guestRequirements: GuestRequirements @relation(strategy: EMBED)
-  policies: Policies @relation(strategy: EMBED)
-  houseRules: HouseRules @relation(strategy: EMBED)
-  bookings: [Booking!]! @relation(strategy: EMBED)
-  pictures: [Picture!]! @relation(strategy: EMBED)
+  reviews: [Review!]! @relation(link: INLINE)
+  amenities: Amenities! @relation(link: INLINE)
+  host: User!
+  pricing: Pricing! @relation(link: INLINE)
+  location: Location! @relation(link: INLINE)
+  views: Views! @relation(link: INLINE)
+  guestRequirements: GuestRequirements @relation(link: INLINE)
+  policies: Policies @relation(link: INLINE)
+  houseRules: HouseRules @relation(link: INLINE)
+  bookings: [Booking!]! @relation(link: INLINE)
+  pictures: [Picture!]! @relation(link: INLINE)
   popularity: Int!
 }
 
@@ -103,22 +103,22 @@ type Location {
   id: ID! @id
   lat: Float!
   lng: Float!
-  neighbourHood: Neighbourhood @relation(strategy: EMBED)
+  neighbourHood: Neighbourhood
   user: User
   place: Place
   address: String
   directions: String
-  experience: Experience @relation(strategy: EMBED)
-  restaurant: Restaurant @relation(strategy: EMBED)
+  experience: Experience @relation(link: INLINE)
+  restaurant: Restaurant @relation(link: INLINE)
 }
 
 type Neighbourhood {
   id: ID! @id
-  locations: [Location!]! @relation(strategy: EMBED)
+  locations: [Location!]! @relation(link: INLINE)
   name: String!
   slug: String!
-  homePreview: Picture @relation(strategy: EMBED)
-  city: City! @relation(strategy: EMBED)
+  homePreview: Picture @relation(link: INLINE)
+  city: City! @relation(link: INLINE)
   featured: Boolean!
   popularity: Int!
 }
@@ -136,13 +136,13 @@ type Picture {
 
 type Experience {
   id: ID! @id
-  category: ExperienceCategory @relation(strategy: EMBED)
+  category: ExperienceCategory @relation(link: INLINE)
   title: String!
   host: User!
   location: Location!
   pricePerPerson: Int!
-  reviews: [Review!]! @relation(strategy: EMBED)
-  preview: Picture! @relation(strategy: EMBED)
+  reviews: [Review!]! @relation(link: INLINE)
+  preview: Picture! @relation(link: INLINE)
   popularity: Int!
 }
 
@@ -150,7 +150,7 @@ type ExperienceCategory {
   id: ID! @id
   mainColor: String! @default(value: "#123456")
   name: String!
-  experience: Experience @relation(strategy: EMBED)
+  experience: Experience
 }
 
 type Amenities {
@@ -210,7 +210,7 @@ type Review {
   cleanliness: Int!
   communication: Int!
   place: Place!
-  experience: Experience @relation(strategy: EMBED)
+  experience: Experience
 }
 
 type Booking {
@@ -220,7 +220,7 @@ type Booking {
   place: Place!
   startDate: DateTime!
   endDate: DateTime!
-  payment: Payment @relation(strategy: EMBED)
+  payment: Payment @relation(link: INLINE)
 }
 
 type Payment {
@@ -229,8 +229,8 @@ type Payment {
   serviceFee: Float!
   placePrice: Float!
   totalPrice: Float!
-  booking: Booking! @relation(strategy: EMBED)
-  paymentMethod: PaymentAccount! @relation(strategy: EMBED)
+  booking: Booking!
+  paymentMethod: PaymentAccount!
 }
 
 type PaymentAccount {
@@ -238,16 +238,16 @@ type PaymentAccount {
   createdAt: DateTime! @createdAt
   type: PAYMENT_PROVIDER
   user: User!
-  payments: [Payment!]! @relation(strategy: EMBED)
-  paypal: PaypalInformation @relation(strategy: EMBED)
-  creditcard: CreditCardInformation @relation(strategy: EMBED)
+  payments: [Payment!]! @relation(link: INLINE)
+  paypal: PaypalInformation @relation(link: INLINE)
+  creditcard: CreditCardInformation @relation(link: INLINE)
 }
 
 type PaypalInformation {
   id: ID! @id
   createdAt: DateTime! @createdAt
   email: String!
-  paymentAccount: PaymentAccount! @relation(strategy: EMBED)
+  paymentAccount: PaymentAccount!
 }
 
 type CreditCardInformation {
@@ -261,7 +261,7 @@ type CreditCardInformation {
   lastName: String!
   postalCode: String!
   country: String!
-  paymentAccount: PaymentAccount @relation(strategy: EMBED)
+  paymentAccount: PaymentAccount
 }
 
 type Message {
@@ -287,7 +287,7 @@ type Restaurant {
   createdAt: DateTime! @createdAt
   title: String!
   avgPricePerPerson: Int!
-  pictures: [Picture!]! @relation(strategy: EMBED)
+  pictures: [Picture!]! @relation(link: INLINE)
   location: Location!
   isCurated: Boolean! @default(value: true)
   slug: String!
